@@ -149,14 +149,6 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		}
 
-		/*
-		if (MENU_BTN_START == wParam) 
-		}
-		else if (MENU_BTN_EXIT == wParam) {
-		}
-		else if (MENU_BTN_GUESS == wParam) {
-		}
-		*/
 		break;
 	}
 	case WM_LBUTTONDOWN: {
@@ -193,7 +185,6 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_KEYDOWN: {
 		switch (wParam) {
 		case VK_ESCAPE:
-			//THIS->client.Disconnect();
 			PostQuitMessage(0);
 			return 0;
 		}

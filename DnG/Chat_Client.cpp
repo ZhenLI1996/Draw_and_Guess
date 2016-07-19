@@ -8,7 +8,6 @@ Chat_Client* Chat_Client::self = nullptr;
 int test_pull_cnt = 0;
 
 Chat_Client::Chat_Client(char* ipad, int port):  port(port), quit(false), status(SEND_Empty){
-	//File.open("sizeof1", std::fstream::out | std::fstream::binary);
 	self = this;
 	strcpy_s(ip, strnlen_s(ipad, 15) + 1, ipad);
 	event = CreateEvent(0, 0, 0, 0);
@@ -71,16 +70,10 @@ unsigned long Chat_Client::PullFromServer(void* data) {
 	char send_buf[3];
 	send_buf[2] = 0;
 	while (!self->quit && recv(self->clt, send_buf, 2, 0) > 0){
-		//MessageBoxA(0, "send_buf: ", 0, MB_OK);
-		//MessageBoxA(0, send_buf, 0, MB_OK);
-		//MessageBoxA(0, "test_pull_cnt: ", 0, MB_OK);
-		//MessageBoxA(0, to_string(test_pull_cnt).c_str(), 0, MB_OK);
 		if (!strcmp(send_buf, MY_SEND_DRAW_LINE)) {
-			//MessageBoxA(0, "Into DrawLine", 0, MB_OK);			
 			if (self->DrawLine()) break;
 		}
 		else {
-			//MessageBoxA(0, "Into Else", 0, MB_OK);
 			// !!!HERE
 		}
 		test_pull_cnt++;
@@ -102,7 +95,6 @@ unsigned long Chat_Client::SendToServer(void* data) {
 			case SEND_DrawLine:
 			{
 				unsigned int size = self->V_vec.size() * sizeof(VALUE);
-				//MessageBox(0, std::to_wstring(size).c_str(), 0, MB_OK);
 				send(self->clt, MY_SEND_DRAW_LINE, 2, 0);
 				send(self->clt, reinterpret_cast<char*>(&size), 4, 0);
 				send(self->clt, reinterpret_cast<char*>(&(self->V_vec[0])), size, 0);
@@ -140,7 +132,6 @@ bool Chat_Client::pack(UINT msg, LPARAM lparam) {
 	*reinterpret_cast<UINT*>(V.value) = msg;
 	*reinterpret_cast<LPARAM*>(V.value + 4) = lparam;
 	V_vec.push_back(V);
-	//File.write(value, 15);
 	LeaveCriticalSection(&lock);
 	if (WM_LBUTTONUP == msg)
 		// Send to Server
@@ -156,15 +147,10 @@ void Chat_Client::Disconnect() {
 
 
 int Chat_Client::DrawLine() {
-	//MessageBoxA(0, "test_pull_cnt: ", 0, MB_OK);
-	//MessageBoxA(0, to_string(test_pull_cnt).c_str(), 0, MB_OK);
 	char size_buf[5];
 	size_buf[4] = 0;
 	if (recv(self->clt, size_buf, 4, 0) <= 0) return 1;
-	//MessageBoxA(0, "size_buf: ", 0, MB_OK);
-	//MessageBoxA(0, size_buf, 0, MB_OK);
 	unsigned int size = *reinterpret_cast<unsigned int*>(size_buf);
-	//MessageBoxA(0, "size: ", 0, MB_OK);
 	MessageBoxA(0, std::to_string(size).c_str(), 0, MB_OK);
 	char* buffer = new char[size + 1];
 
@@ -179,21 +165,7 @@ int Chat_Client::DrawLine() {
 		current_pos += fragment_size;
 		cout << fragment_size << endl;
 	}
-
-	/*
-	std::string ws;
-	for (int i = 0; i < size; i += 12) {
-		UINT tmp_msg = *reinterpret_cast<UINT*>(buffer + i);
-		LPARAM tmp_lparam = *reinterpret_cast<LPARAM*>(buffer + i + 4);
-		ws += std::to_string(tmp_msg) + std::string(", ") + std::to_string(tmp_lparam) + std::string("\n");
-	}
-	//MessageBoxA(0, ws.c_str(), 0, MB_OK);
-	*/
-
-
-
 	for (unsigned int i = 0; i < size; i += 12) {
-		//MessageBoxA(hWnd, "HERE", 0, MB_OK);	// test pass
 		UINT tmp_msg = *reinterpret_cast<UINT*>(buffer + i);
 		LPARAM tmp_lparam = *reinterpret_cast<LPARAM*>(buffer + i + 4);
 		if (!i)
