@@ -73,6 +73,12 @@ unsigned long Chat_Client::PullFromServer(void* data) {
 		if (!strcmp(send_buf, MY_SEND_DRAW_LINE)) {
 			if (self->DrawLine()) break;
 		}
+		else if (!strcmp(send_buf, MY_SEND_GUESS_RIGHT)) {
+			if (self->GuessResult(true)) break;
+		}
+		else if (!strcmp(send_buf, MY_SEND_GUESS_WRONG)) {
+			if (self->GuessResult(false)) break;
+		}
 		else {
 			// !!!HERE
 		}
@@ -190,5 +196,22 @@ int Chat_Client::guess(const wchar_t* str) {
 	status = SEND_Guess;
 	wcsncpy_s(GuessStr, str, 5);
 	SetEvent(event);
+	return 0;
+}
+
+
+int Chat_Client::GuessResult(bool right) {
+	if (right) {
+		// guess right
+		MessageBoxA(0, "Someone Guesses Right", 0, MB_OK);
+		PostMessage(self->hWnd, MY_WM_GUESS_RIGHT, 0, 0);
+	}
+	else {
+		// guess wrong
+		MessageBoxA(0, "Someone Guesses Wrong", 0, MB_OK);
+		PostMessage(self->hWnd, MY_WM_GUESS_WRONG, 0, 0);
+
+	}
+
 	return 0;
 }

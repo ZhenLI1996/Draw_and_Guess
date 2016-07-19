@@ -223,7 +223,22 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		InvalidateRect(hWnd, &rect, false);
 		break;
 	}
-
+	case MY_WM_GUESS_RIGHT:
+	{
+		TCHAR text[] = L"Someone Guesses Right";
+		RECT rect = { 120, 60, 800, 100};
+		TextOut(memdc, rect.left, rect.top, text, ARRAYSIZE(text));
+		InvalidateRect(hWnd, &rect, false);
+	}
+	break;
+	case MY_WM_GUESS_WRONG:
+	{
+		TCHAR text[] = L"Someone Guesses Wrong";
+		RECT rect = { 120, 60, 800, 100 };
+		TextOut(memdc, rect.left, rect.top, text, ARRAYSIZE(text));
+		InvalidateRect(hWnd, &rect, false);
+	}
+	break;
 	default:
 		return DefWindowProcW(hWnd, msg, wParam, lParam);
 	}

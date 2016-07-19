@@ -49,6 +49,7 @@ private:
 	wchar_t GuessStr[5];
 
 	int DrawLine();
+	int GuessResult(bool);
 
 	// status variable
 	int status;
