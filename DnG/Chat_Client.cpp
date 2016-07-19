@@ -178,7 +178,9 @@ int Chat_Client::DrawLine() {
 }
 
 
-int Chat_Client::guess(const char* str) {
-
+int Chat_Client::guess(const wchar_t* str) {
+	// there are at most 5 wide characters in str
+	int i = wcslen(str);
+	MessageBoxA(0, std::to_string(i).c_str(), 0, MB_OK);
 	return 0;
 }

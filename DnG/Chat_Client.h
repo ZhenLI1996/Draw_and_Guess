@@ -19,7 +19,7 @@ public:
 	bool pack(UINT msg, LPARAM lparam);
 
 	// guess function
-	int guess(const char* str);
+	int guess(const wchar_t* str);
 	
 	void Disconnect();
 private:

@@ -254,6 +254,7 @@ INT_PTR CALLBACK GUI::DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 			wchar_t buffer[5] = { 0 };
 			GetDlgItemTextW(hDlg, MY_IDD_BOX_EDIT1, buffer, 5);	// '\0' counts
 			MessageBox(0, buffer, 0, MB_OK);
+			THIS->client.guess(buffer);
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
 		}
