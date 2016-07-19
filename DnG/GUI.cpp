@@ -12,7 +12,7 @@ WndHeight(GetSystemMetrics(SM_CYSCREEN)),
 hInstance(hInstance),
 cmdShow(cmdShow),
 //client("115.159.49.180", 2225)
-client("192.168.20.102", 2225)
+client("192.168.20.103", 2225)
 {
 	THIS = this;
 	client.ClientInit();
@@ -248,7 +248,7 @@ int GUI::MyWM_COMMAND(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-// “关于”框的消息处理程序。
+// “Guess”框的消息处理程序。
 INT_PTR CALLBACK GUI::DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);

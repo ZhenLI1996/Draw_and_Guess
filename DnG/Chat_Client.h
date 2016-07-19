@@ -17,6 +17,9 @@ public:
 
 	// pack function
 	bool pack(UINT msg, LPARAM lparam);
+
+	// guess function
+	int guess(const char* str);
 	
 	void Disconnect();
 private:
@@ -46,5 +49,11 @@ private:
 
 	int DrawLine();
 
+	// status variable
+	int status;
+
 };
 
+#define SEND_Empty		0
+#define SEND_DrawLine	1
+#define SEND_Guess		2

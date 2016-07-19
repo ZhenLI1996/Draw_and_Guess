@@ -7,7 +7,7 @@ using namespace std;
 Chat_Client* Chat_Client::self = nullptr;
 int test_pull_cnt = 0;
 
-Chat_Client::Chat_Client(char* ipad, int port):  port(port), quit(false){
+Chat_Client::Chat_Client(char* ipad, int port):  port(port), quit(false), status(SEND_Empty){
 	//File.open("sizeof1", std::fstream::out | std::fstream::binary);
 	self = this;
 	strcpy_s(ip, strnlen_s(ipad, 15) + 1, ipad);
@@ -98,12 +98,31 @@ unsigned long Chat_Client::SendToServer(void* data) {
 	Chat_Client* self = static_cast<Chat_Client*>(data);	
 	while (!self->quit && !WaitForSingleObject(self->event, INFINITE)) {
 		EnterCriticalSection(&self->lock);
-		unsigned int size = self->V_vec.size() * sizeof(VALUE);
-		//MessageBox(0, std::to_wstring(size).c_str(), 0, MB_OK);
-		send(self->clt, MY_SEND_DRAW_LINE, 2, 0);
-		send(self->clt, reinterpret_cast<char*>(&size), 4, 0);
-		send(self->clt, reinterpret_cast<char*>(&(self->V_vec[0])), size, 0);
-		self->V_vec.clear();
+		switch (self->status) {
+			case SEND_DrawLine:
+			{
+				unsigned int size = self->V_vec.size() * sizeof(VALUE);
+				//MessageBox(0, std::to_wstring(size).c_str(), 0, MB_OK);
+				send(self->clt, MY_SEND_DRAW_LINE, 2, 0);
+				send(self->clt, reinterpret_cast<char*>(&size), 4, 0);
+				send(self->clt, reinterpret_cast<char*>(&(self->V_vec[0])), size, 0);
+				self->V_vec.clear();
+				self->status = SEND_Empty;
+			}
+			break;
+
+			case SEND_Guess:
+			{
+				self->status = SEND_Empty;
+			}
+			break;
+
+			default:
+			{
+				self->status = SEND_Empty;
+			}
+			break;
+		}
 		LeaveCriticalSection(&self->lock);
 	}
 	MessageBox(0, L"Server disconnected when send\n", 0, MB_OK);
@@ -123,8 +142,9 @@ bool Chat_Client::pack(UINT msg, LPARAM lparam) {
 	V_vec.push_back(V);
 	//File.write(value, 15);
 	LeaveCriticalSection(&lock);
-	if(WM_LBUTTONUP == msg)
+	if (WM_LBUTTONUP == msg)
 		// Send to Server
+		status = SEND_DrawLine;
 		SetEvent(event);
 
 	return true;
@@ -182,5 +202,11 @@ int Chat_Client::DrawLine() {
 			PostMessage(self->hWnd, MY_WM_SYNC_LINE, 0, tmp_lparam);
 	}
 	delete[] buffer;
+	return 0;
+}
+
+
+int Chat_Client::guess(const char* str) {
+
 	return 0;
 }
