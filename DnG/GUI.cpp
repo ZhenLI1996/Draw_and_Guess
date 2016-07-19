@@ -103,8 +103,9 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		break;
 	}
 	case WM_COMMAND: {
-		if (MENU_BTN_START == wParam) {
-
+		switch (wParam) {
+		case MENU_BTN_START:
+		{	
 			ShowWindow(THIS->hBTNStart, SW_HIDE);
 			ShowWindow(THIS->hBTNExit, SW_HIDE);
 
@@ -116,7 +117,7 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			HBITMAP hmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
 			ReleaseDC(hWnd, hdc);
 			SelectObject(memdc, hmap);
-			
+
 			HBRUSH hBrush = CreateSolidBrush(0xFFFFFF);
 			FillRect(memdc, &rect, hBrush);
 			DeleteObject(hBrush);
@@ -133,16 +134,29 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			SelectObject(memdc, pen);
 
 			THIS->client.ClientConnect();
-
 		}
-		else if (MENU_BTN_EXIT == wParam) {
+			break;
+		case MENU_BTN_EXIT:
 			PostQuitMessage(0);
 			return 0;
-		}
-		else if (MENU_BTN_GUESS == wParam) {
+			break;
+		case MENU_BTN_GUESS:
 			DialogBox(THIS->hInstance, MAKEINTRESOURCE(MY_IDD_BOX), hWnd, DialogProc);
 			return 0;
+			break;
+		default:
+			break;
+
 		}
+
+		/*
+		if (MENU_BTN_START == wParam) 
+		}
+		else if (MENU_BTN_EXIT == wParam) {
+		}
+		else if (MENU_BTN_GUESS == wParam) {
+		}
+		*/
 		break;
 	}
 	case WM_LBUTTONDOWN: {
