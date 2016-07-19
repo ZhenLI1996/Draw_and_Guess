@@ -1,0 +1,10 @@
+#pragma once
+
+// MY DEFINES
+#define MY_SEND_DRAW_LINE		"DL"
+#define MY_SEND_DRAW_ENABLE		"ED"
+#define MY_SEND_DRAW_DISABLE	"DD"
+#define MY_SEND_DISCONNECT		"DC"
+#define MY_SEND_GUESS			"GS"
+#define MY_SEND_GUESS_RIGHT		"GR"
+#define MY_SEND_GUESS_WRONG		"GW"
