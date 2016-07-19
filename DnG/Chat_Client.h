@@ -44,8 +44,9 @@ private:
 	static unsigned long _stdcall SendToServer(void*);
 	bool quit;
 
+	// variables storing data
 	std::vector<VALUE> V_vec;
-	//std::fstream File;
+	wchar_t GuessStr[5];
 
 	int DrawLine();
 

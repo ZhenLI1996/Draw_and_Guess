@@ -105,6 +105,11 @@ unsigned long Chat_Client::SendToServer(void* data) {
 
 			case SEND_Guess:
 			{
+				MessageBox(0, self->GuessStr, 0, MB_OK);
+				unsigned int size_with_ending= (wcslen(self->GuessStr) + 1)*sizeof(wchar_t);
+				send(self->clt, MY_SEND_GUESS, 2, 0);
+				send(self->clt, reinterpret_cast<char*>(&size_with_ending), 4, 0);
+				send(self->clt, reinterpret_cast<char*>(self->GuessStr), size_with_ending, 0);
 				self->status = SEND_Empty;
 			}
 			break;
@@ -180,7 +185,10 @@ int Chat_Client::DrawLine() {
 
 int Chat_Client::guess(const wchar_t* str) {
 	// there are at most 5 wide characters in str
-	int i = wcslen(str);
-	MessageBoxA(0, std::to_string(i).c_str(), 0, MB_OK);
+	unsigned int i = wcslen(str);
+	//MessageBoxA(0, std::to_string(i).c_str(), 0, MB_OK);
+	status = SEND_Guess;
+	wcsncpy_s(GuessStr, str, 5);
+	SetEvent(event);
 	return 0;
 }

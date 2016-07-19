@@ -17,6 +17,7 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+#include <cwchar>
 #include <WinSock2.h>
 
 #pragma comment(lib, "ws2_32.lib")
