@@ -4,6 +4,7 @@
 #include "Chat_Client.h"
 
 GUI* GUI::THIS = nullptr;
+HDC GUI::memdc = 0;
 
 
 GUI::GUI(HINSTANCE hInstance, int cmdShow) :
@@ -43,7 +44,7 @@ int GUI::run() {
 	glblhInst = hInstance; // 将实例句柄存储在全局变量中
 
 
-	HWND hWnd = CreateWindow(L"testG", L"GUI_class_test_1", WS_CLIPCHILDREN | WS_POPUP,
+	hWnd = CreateWindow(L"testG", L"GUI_class_test_1", WS_CLIPCHILDREN | WS_POPUP,
 		0, 0, WndWidth, WndHeight, nullptr, nullptr, hInstance, nullptr);
 
 	client.SetHWND(hWnd);
@@ -56,6 +57,9 @@ int GUI::run() {
 	ShowWindow(hWnd, cmdShow);
 	UpdateWindow(hWnd);
 
+	CreateThread(0, 0, PrintGuessResult, &memdc, 0, 0);
+	hPrtResEvent = CreateEvent(0, 0, 0, 0);
+	InitializeCriticalSection(&PrtResLock);
 
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MY1));
 	// 主消息循环: 
@@ -74,7 +78,6 @@ int GUI::run() {
 
 
 long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static HDC memdc = 0;
 	static HBITMAP hb = 0;
 	static HPEN pen = 0;
 	switch (msg) {
@@ -133,6 +136,18 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			pen = CreatePen(PS_SOLID, 5, 0x000000);
 			SelectObject(memdc, pen);
 
+			//=================
+			LOGFONTA logfont = { 0 };
+			strcpy_s(logfont.lfFaceName, 15, "Comic Sans MS");
+			logfont.lfHeight = 160;
+			logfont.lfWidth = 50;
+			HFONT hFont = CreateFontIndirectA(&logfont);
+			SelectObject(memdc, hFont);
+			RECT rect2 = { 220, 160, 800, 200 }; 
+			//TextOutA(memdc, rect2.left, rect2.top, "TEST", 4);
+			InvalidateRect(hWnd, &rect2, false);
+			//=================
+			
 			THIS->client.ClientConnect();
 		}
 			break;
@@ -225,18 +240,30 @@ long _stdcall GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	}
 	case MY_WM_GUESS_RIGHT:
 	{
-		TCHAR text[] = L"Someone Guesses Right";
-		RECT rect = { 120, 60, 800, 100};
-		TextOut(memdc, rect.left, rect.top, text, ARRAYSIZE(text));
-		InvalidateRect(hWnd, &rect, false);
+		static const wchar_t text[] = L"0RIT";
+		EnterCriticalSection(&THIS->PrtResLock);
+		wcsncpy_s(THIS->ResToPrt, text, 5);
+		SetEvent(THIS->hPrtResEvent);
+		LeaveCriticalSection(&THIS->PrtResLock);
+		//TCHAR text[] = L"Someone Guesses Right";
+		//RECT rect = { 120, 60, 800, 100};
+		//SetTextColor(memdc, RGB(255, 255, 255));
+		//TextOut(memdc, rect.left, rect.top, text, ARRAYSIZE(text));
+		//InvalidateRect(hWnd, &rect, false);
 	}
 	break;
 	case MY_WM_GUESS_WRONG:
 	{
-		TCHAR text[] = L"Someone Guesses Wrong";
-		RECT rect = { 120, 60, 800, 100 };
-		TextOut(memdc, rect.left, rect.top, text, ARRAYSIZE(text));
-		InvalidateRect(hWnd, &rect, false);
+		static const wchar_t text[] = L"WRNG";
+		EnterCriticalSection(&THIS->PrtResLock);
+		wcsncpy_s(THIS->ResToPrt, text, 5);
+		SetEvent(THIS->hPrtResEvent);
+		LeaveCriticalSection(&THIS->PrtResLock);
+		//TCHAR text[] = L"Someone Guesses Wrong";
+		//RECT rect = { 120, 60, 800, 100 };
+		//SetTextColor(memdc, RGB(255, 255, 255));
+		//TextOut(memdc, rect.left, rect.top, text, ARRAYSIZE(text));
+		//InvalidateRect(hWnd, &rect, false);
 	}
 	break;
 	default:
@@ -280,4 +307,39 @@ INT_PTR CALLBACK GUI::DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 		break;
 	}
 	return (INT_PTR)FALSE;
+}
+
+
+
+unsigned long GUI::PrintGuessResult(void* data) {
+	bool quit = false;
+	//HDC memdc = *reinterpret_cast<HDC*>(data);
+	while (!quit && !WaitForSingleObject(THIS->hPrtResEvent, INFINITE)) {
+		RECT rect = { 220, 160, 800, 500};
+		//SetTextColor(memdc, RGB(100, 100, 100));
+		//TextOut(memdc, rect.left, rect.top, THIS->ResToPrt, ARRAYSIZE(ResToPrt));
+		//InvalidateRect(THIS->hWnd, &rect, false);
+		//UpdateWindow(THIS->hWnd);
+
+		for (int i = 255; i >=0; i -= 17) {
+			SetTextColor(memdc, RGB(i, i, i));
+			TextOut(memdc, rect.left, rect.top, THIS->ResToPrt, ARRAYSIZE(ResToPrt));
+			InvalidateRect(THIS->hWnd, &rect, false);
+			UpdateWindow(THIS->hWnd);
+			Sleep(20);
+		}
+
+		Sleep(3000);
+
+		for (int i = 0; i <= 255; i += 17) {
+			SetTextColor(memdc, RGB(i, i, i));
+			TextOut(memdc, rect.left, rect.top, THIS->ResToPrt, ARRAYSIZE(ResToPrt));
+			InvalidateRect(THIS->hWnd, &rect, false);
+			UpdateWindow(THIS->hWnd);
+			Sleep(20);
+		}
+	}
+
+
+	return 0;
 }

@@ -23,6 +23,8 @@ private:
 // functions:
 	static long _stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+	static unsigned long _stdcall PrintGuessResult(void*);
+
 
 	// create button
 	int CreateButton(HWND hWnd, int BtnCnt);
@@ -45,6 +47,7 @@ private:
 	bool MouseDown;
 
 	// HANDLE of buttons
+	HWND hWnd;
 	HWND hBTNStart;
 	HWND hBTNExit;
 	HWND hBTNGuess;
@@ -55,8 +58,16 @@ private:
 	WCHAR MainWndTitle[MAX_LOADSTRING];                  // 标题栏文本
 	WCHAR MainWndClass[MAX_LOADSTRING];            // 主窗口类名
 
+	// print result 
+	HANDLE hPrtResEvent;
+	CRITICAL_SECTION PrtResLock;
+	wchar_t ResToPrt[5];
 
 	// to cater for WndProc
 	static GUI* THIS;
+
+
+	static HDC memdc;
+
 };
 
